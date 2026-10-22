@@ -71,9 +71,9 @@ public class Main {
 class HashTable{
 
     private static final Node[] table = new Node[100];
-    private static final int CAP = table.length;
+    private static final int CAP = 100;
     private static int LEN = 0;
-    private static final Node[] LAST_THREE_INSERTS = new Node[3];
+    private static Node[] LAST_THREE_INSERTS = new Node[3];
 
     public static int hash(int key){
         return key % CAP;

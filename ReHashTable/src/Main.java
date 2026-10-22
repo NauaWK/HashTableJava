@@ -1,6 +1,4 @@
 
-import org.w3c.dom.Node;
-
 import java.util.Random;
 
 public class Main {
@@ -36,7 +34,7 @@ class HashTable {
     private static final int MAX_CAP = (int) (CAP * 0.9);
     private static int LEN = 0;
     private static int TOTAL_COLISIONS = 0;
-    private static final Node[] mostColisionNodes = new Node[3];
+    private static Node[] mostColisionNodes = new Node[3];
 
     private static int hash(int key) {
         return key % CAP;
