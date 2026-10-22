@@ -1,7 +1,6 @@
-
 import java.util.Random;
 
-public class Main {
+public class ReHash {
     public static void main(String[] args) {
         long seed = 1090;
         Random r = new Random(seed);
@@ -18,12 +17,21 @@ public class Main {
         }
 
         System.out.println("Total de colisoes: " + HashTable.getTotalColisions());
-        System.out.print("Os elementos que mais colidiram:");
+        System.out.print("Os 3 elementos que mais colidiram:");
         for(HashTable.Node n : HashTable.getMostColisionNodes()){
             if(n != null ) System.out.print(" | Valor " + n.getVal() + " - Qtd colisoes " + n.getNumberOfColisions() + " | ");
             else System.out.print(" | Valor " + null + " - Qtd colisoes " + null + " | ");
         }
         System.out.println();
+
+        System.out.println("Teste de busca com os 3 elementos que mais colidiram: ");
+        for(HashTable.Node n : HashTable.getMostColisionNodes()){
+            if (n != null) {
+                int index = HashTable.search(n.getVal());
+                if (index != -1) System.out.println("Valor " + n.getVal()+ " encontrado na posicao " + index);
+                else System.out.println("Valor " + n.getVal() + " nao encontrado");
+            }
+        }
     }
 }
 
@@ -46,6 +54,8 @@ class HashTable {
 
     private static int findAvaliableReHash(int key, Node n){
         int attempts = 0; //para controlar quando todas as posicoes ja estiverem ocupadas na tabela, impedindo loop infinito
+        boolean avaliableInsertion = false; 
+
         while(attempts < CAP && table[key] != null){
             System.out.println("Colisao do valor " + n.getVal() + " na posicao " + key);
             TOTAL_COLISIONS++;
@@ -54,19 +64,23 @@ class HashTable {
             key = reHash(key);
         }
 
-        for(int i = 0; i < 3; i++){
-            if(mostColisionNodes[i] != null){       
-                if(mostColisionNodes[i].getNumberOfColisions() < n.getNumberOfColisions()){ 
-                    mostColisionNodes[i] = n; 
-                    break; //saindo do loop garantindo que um unico valor nao ocupe as outras posicoes repetidamente (se tiver um alto nº de colisoes por exemplo)
+        if(table[key] == null) avaliableInsertion = true;
+
+        if (avaliableInsertion) {
+            for (int i = 0; i < 3; i++) {
+                if (mostColisionNodes[i] == null ||
+                    n.getNumberOfColisions() >
+                    mostColisionNodes[i].getNumberOfColisions()) {
+
+                    for (int j = 2; j > i; j--) { //desloca os valores para a direita (mantendo ordem decrescente)
+                        mostColisionNodes[j] = mostColisionNodes[j - 1];
+                    }
+
+                    mostColisionNodes[i] = n;
+                    break;
                 }
             }
-            else{
-                mostColisionNodes[i] = n;
-                break; //saindo do loop tambem para evitar que o mesmo valor ocupe todas as posicoes
-            }
-        }
-
+        }      
         return table[key] == null ? key : -1;
     }
 
@@ -93,6 +107,17 @@ class HashTable {
             LEN++;
             System.out.println("Elemento " + newNode.getVal() + " inserido na NOVA posicao: " + reHashIndex);
         }
+    }
+
+    public static int search(int key){
+        int hashIndex = hash(key);
+        int attempts = 0;
+        while(attempts < CAP && table[hashIndex] != null){
+            if(table[hashIndex].getVal() == key) return hashIndex; 
+            hashIndex = reHash(hashIndex);
+            attempts++;
+        }
+        return -1;       
     }
 
     public static Node[] getTable() {

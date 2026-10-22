@@ -1,8 +1,6 @@
-
-
 import java.util.Random;
 
-public class Main {
+public class HashEncadeado {
     public static void main(String[] args) {
         long seed = 1090;
         Random r = new Random(seed);
@@ -73,9 +71,10 @@ class HashTable{
     private static final Node[] table = new Node[100];
     private static final int CAP = 100;
     private static int LEN = 0;
+    private static int totalListInserts = 0;
     private static Node[] LAST_THREE_INSERTS = new Node[3];
 
-    public static int hash(int key){
+    private static int hash(int key){
         return key % CAP;
     }
 
@@ -91,15 +90,13 @@ class HashTable{
         }
 
         System.out.println("Colisao!");
-        if(CAP - LEN <= 3 && CAP - LEN > 0){
-            LAST_THREE_INSERTS[CAP - LEN - 1] = newNode;
-        }
-
         Node actual = table[hashIndex];
 
         if (newNode.getVal() < actual.getVal()) {
             newNode.setNext(actual);
             table[hashIndex] = newNode;
+            LAST_THREE_INSERTS[totalListInserts % 3] = newNode;
+            totalListInserts++;
             return;
         }
 
@@ -109,6 +106,8 @@ class HashTable{
 
         newNode.setNext(actual.getNext());
         actual.setNext(newNode);
+        LAST_THREE_INSERTS[totalListInserts % 3] = newNode;
+        totalListInserts++;
     }
 
     public static Node[] getTable(){
